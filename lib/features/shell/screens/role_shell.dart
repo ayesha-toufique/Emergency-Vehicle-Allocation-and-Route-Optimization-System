@@ -334,7 +334,7 @@ class _RoleShellState extends State<RoleShell> {
                                 children: [
                                   Icon(
                                     tab.icon,
-                                    size: 19,
+                                    size: tabs.length >= 6 ? 18 : 19,
                                     color: isSelected
                                         ? Colors.white
                                         : (isDark
@@ -343,11 +343,15 @@ class _RoleShellState extends State<RoleShell> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    tab.label,
+                                    tabs.length >= 6 && tab.label == 'Staff & Users'
+                                        ? 'Staff'
+                                        : (tabs.length >= 6 && tab.label == 'Operations Map'
+                                            ? 'Map'
+                                            : tab.label),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(
-                                      fontSize: 9.5,
+                                      fontSize: tabs.length >= 6 ? 8.8 : 10.0,
                                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                       color: isSelected
                                           ? Colors.white

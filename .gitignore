@@ -45,3 +45,12 @@ app.*.map.json
 /android/app/release
 config.bat
 node_modules
+
+# Python / Django
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+Backend/.env
+

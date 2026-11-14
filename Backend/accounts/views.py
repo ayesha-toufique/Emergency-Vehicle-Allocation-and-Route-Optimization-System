@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from dispatch.services.audit import audit
@@ -30,6 +31,8 @@ class LoginView(APIView):
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def post(self, request):
         s = LoginSerializer(data=request.data, context={"request": request})
@@ -44,6 +47,8 @@ class RegisterView(APIView):
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def post(self, request):
         s = RegisterSerializer(data=request.data)
@@ -81,6 +86,7 @@ class ChangePasswordView(APIView):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ScopedRateThrottle])
 def forgot_password(request):
     """
     POST /api/auth/forgot-password/ {email}
@@ -93,6 +99,9 @@ def forgot_password(request):
     if User.objects.filter(email=email).exists():
         audit("PASSWORD_RESET_REQUESTED", None, {"email": email})
     return Response({"ok": True, "message": "If this email is registered, reset instructions have been sent."})
+
+
+forgot_password.throttle_scope = "auth"
 
 
 class UserListCreateView(generics.ListCreateAPIView):

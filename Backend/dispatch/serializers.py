@@ -208,7 +208,7 @@ class StatusChangeSerializer(serializers.Serializer):
 
 class ManualAssignSerializer(serializers.Serializer):
     vehicle_id = serializers.IntegerField()
-    notes = serializers.CharField(required=False, allow_blank=True, default="")
+    notes = serializers.CharField(required=False, allow_blank=True, default="", max_length=500)
 
 
 # ---------------------------------------------------------------------------
@@ -256,16 +256,16 @@ class RoadEdgeSerializer(serializers.ModelSerializer):
 
 class RoadBlockSerializer(serializers.Serializer):
     is_blocked = serializers.BooleanField()
-    reason = serializers.CharField(required=False, allow_blank=True, default="")
+    reason = serializers.CharField(required=False, allow_blank=True, default="", max_length=500)
 
 
 class RouteRequestSerializer(serializers.Serializer):
     vehicle_id = serializers.IntegerField(required=False)
     emergency_id = serializers.IntegerField(required=False)
-    from_lat = serializers.FloatField(required=False)
-    from_lng = serializers.FloatField(required=False)
-    to_lat = serializers.FloatField(required=False)
-    to_lng = serializers.FloatField(required=False)
+    from_lat = serializers.FloatField(required=False, min_value=-90.0, max_value=90.0)
+    from_lng = serializers.FloatField(required=False, min_value=-180.0, max_value=180.0)
+    to_lat = serializers.FloatField(required=False, min_value=-90.0, max_value=90.0)
+    to_lng = serializers.FloatField(required=False, min_value=-180.0, max_value=180.0)
 
     def validate(self, attrs):
         has_ids = "vehicle_id" in attrs and "emergency_id" in attrs

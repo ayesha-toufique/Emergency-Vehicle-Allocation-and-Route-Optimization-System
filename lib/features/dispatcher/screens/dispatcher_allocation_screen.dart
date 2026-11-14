@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/demo_data.dart';
 import '../../../core/mock/mock_repository.dart';
+import '../../../core/services/api_service.dart';
 import '../../../core/widgets/feedback/state_widgets.dart';
 import '../../../core/widgets/feedback/status_chip.dart';
 
@@ -448,7 +449,14 @@ class _DispatcherAllocationScreenState extends State<DispatcherAllocationScreen>
                           ? null
                           : () async {
                               setState(() => _isProcessing = true);
-                              await Future.delayed(const Duration(milliseconds: 300));
+                              
+                              // Trigger backend DP allocation sync in background if online
+                              try {
+                                final emergencyIdInt = int.tryParse(
+                                  _selectedEmergency!.id.replaceAll(RegExp(r'[^0-9]'), ''),
+                                );
+                                await ApiService().triggerAllocation(emergencyId: emergencyIdInt);
+                              } catch (_) {}
 
                               repo.assignVehicleToEmergency(
                                 _selectedEmergency!.id,

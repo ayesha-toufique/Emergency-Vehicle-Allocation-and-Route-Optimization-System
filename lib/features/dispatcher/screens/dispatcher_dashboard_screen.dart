@@ -204,51 +204,59 @@ class DispatcherDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Metrics Grid (2x2 on mobile, 4-col on tablet/desktop)
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Total Emergencies',
-                        value: '${repo.emergencies.length}',
-                        icon: Icons.emergency_rounded,
-                        iconColor: AppColors.primaryTeal,
-                        subtitle: 'All sectors',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Pending Triage',
-                        value: '${repo.pendingEmergencies.length}',
-                        icon: Icons.pending_actions_rounded,
-                        iconColor: AppColors.statusPending,
-                        subtitle: 'Action required',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Assigned / En Route',
-                        value: '${repo.assignedEmergencies.length}',
-                        icon: Icons.local_shipping_rounded,
-                        iconColor: AppColors.statusAssigned,
-                        subtitle: 'Active units',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Fleet Available',
-                        value: '${repo.availableVehicles.length} / ${repo.vehicles.length}',
-                        icon: Icons.check_circle_outline_rounded,
-                        iconColor: AppColors.statusCompleted,
-                        subtitle: 'Ready to deploy',
-                      ),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final int crossAxisCount = width > 768 ? 4 : (width > 340 ? 2 : 1);
+                    final cardWidth = (width - ((crossAxisCount - 1) * 12)) / crossAxisCount;
+
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Total Emergencies',
+                            value: '${repo.emergencies.length}',
+                            icon: Icons.emergency_rounded,
+                            iconColor: AppColors.primaryTeal,
+                            subtitle: 'All sectors',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Pending Triage',
+                            value: '${repo.pendingEmergencies.length}',
+                            icon: Icons.pending_actions_rounded,
+                            iconColor: AppColors.statusPending,
+                            subtitle: 'Action required',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Assigned / En Route',
+                            value: '${repo.assignedEmergencies.length}',
+                            icon: Icons.local_shipping_rounded,
+                            iconColor: AppColors.statusAssigned,
+                            subtitle: 'Active units',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Fleet Available',
+                            value: '${repo.availableVehicles.length} / ${repo.vehicles.length}',
+                            icon: Icons.check_circle_outline_rounded,
+                            iconColor: AppColors.statusCompleted,
+                            subtitle: 'Ready to deploy',
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 20),

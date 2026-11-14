@@ -43,6 +43,11 @@ def env_list(key, default=""):
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
+
+if not DEBUG and (not SECRET_KEY or SECRET_KEY == "dev-only-insecure-key-change-me"):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be configured in production.")
 
 # ---------------------------------------------------------------------------
 # Hosts / CSRF (ngrok)
@@ -163,25 +168,42 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "dispatch.exceptions.api_exception_handler",
     "DATETIME_FORMAT": "iso-8601",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ] if not TESTING else [],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "10000/min" if TESTING else env("THROTTLE_ANON_RATE", "120/min"),
+        "user": "10000/min" if TESTING else env("THROTTLE_USER_RATE", "600/min"),
+        "auth": "10000/min" if TESTING else env("THROTTLE_AUTH_RATE", "30/min"),
+    },
 }
 
 # ---------------------------------------------------------------------------
 # CORS (Flutter web / emulator / friend's frontend through ngrok)
 # ---------------------------------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL", True)
+CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL", DEBUG)
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "")
 CORS_ALLOW_HEADERS = list(default_headers) + ["ngrok-skip-browser-warning"]
 
 # ---------------------------------------------------------------------------
-# HTTPS (NFR Security). Enable when deployed behind TLS.
+# HTTPS & Security Headers (OWASP Hardening).
 # ---------------------------------------------------------------------------
 # ngrok terminates TLS and forwards plain HTTP, so trust its forwarded header.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SECURE_HSTS_SECONDS = int(env("SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("SECURE_HSTS_SUBDOMAINS", True)
+    SECURE_HSTS_PRELOAD = env_bool("SECURE_HSTS_PRELOAD", True)
 
 # ---------------------------------------------------------------------------
 # ResQ planner settings

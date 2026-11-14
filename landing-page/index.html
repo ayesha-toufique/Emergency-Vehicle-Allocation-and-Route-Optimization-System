@@ -1,0 +1,876 @@
+<!doctype html>
+<!-- data-type: software. data-radius: soft. data-ground: sand. data-buttons: arrow. data-motion -->
+<html lang="en" data-type="software" data-radius="soft" data-ground="sand" data-buttons="arrow" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResQ Operations: emergency route and fleet management</title>
+<meta name="description" content="Mission-critical dispatch, intelligent route optimization, and real-time fleet coordination for emergency responders. Download release package for Android.">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,400..600&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<link rel="stylesheet" href="assets/diagrams/diagram.css">
+<link rel="stylesheet" href="assets/ui/base.css">
+<style>
+:root {
+  --p-bg: #0f0f0f; --p-surface: #1a1a1a; --p-ink: #ffffff; --p-muted: #8f8f8f;
+  --p-accent: #dafa9c; --p-accent-ink: #0f0f0f; --p-action: #dafa9c; --p-action-ink: #0f0f0f;
+  --p-inv-bg: #ffffff; --p-inv-surface: #ececec; --p-inv-ink: #0f0f0f; --p-inv-muted: #5f5f5f;
+  --p-inv-accent: #0f0f0f; --p-inv-accent-ink: #ffffff; --p-inv-action: #0f0f0f; --p-inv-action-ink: #ffffff;
+  --font-display: "Mona Sans", system-ui, sans-serif;
+  --font-text: "Mona Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.045em;
+  --display-tracking-xl: -0.05em;
+  --display-stretch: 90%;
+  --ly-scale: 0.88;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  #features .card.span-4 { grid-column: auto / span 4; }
+  #features .panel { --p-h: 260px; }
+  #specs .grid.fill { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--gutter); }
+  #specs .spec-list { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  #specs .spec-item { padding: 12px; }
+  #specs .frame--split { max-height: 100%; margin-top: 0; }
+}
+@media (max-width: 639px) {
+  #features, #telemetry, #specs { --hm: 2; }
+  #roles, #faq { --hm: 1; }
+  .hero-hud {
+    min-height: 320px;
+    height: 100%;
+  }
+  .hero-hud__canvas {
+    min-height: 200px;
+    padding: 12px;
+  }
+  .hero__media {
+    position: relative;
+    height: 100%;
+  }
+  .hero__media .ly-float {
+    display: none !important;
+  }
+  #roles .role-tablist {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  #roles .role-tab-btn {
+    padding: 8px 10px !important;
+  }
+  #roles .role-tab-btn b {
+    font-size: 12px !important;
+    margin-bottom: 0 !important;
+  }
+  #roles .role-tab-btn span {
+    display: none !important;
+  }
+  #roles .role-tab-btn svg {
+    display: none !important;
+  }
+  #roles .role-panels.frame {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  #roles .role-panels.frame::before {
+    display: none !important;
+  }
+  #roles .role-panel-box {
+    height: auto !important;
+    padding: 16px !important;
+  }
+  #roles .role-panel-box ul {
+    margin: 10px 0 !important;
+    gap: 8px !important;
+  }
+  #specs .frame--split {
+    min-height: 440px;
+    width: 100%;
+    margin-top: 16px;
+    padding: 16px 8px;
+    box-sizing: border-box;
+  }
+}
+
+/* Hero HUD Terminal */
+.hero-hud {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 520px;
+  background: #141716;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  position: relative;
+}
+.hero-hud__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #181d1b;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  font: 500 12px/1 var(--font-mono);
+  color: #9ea7a3;
+}
+.hero-hud__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--p-accent);
+}
+.hero-hud__tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--p-accent);
+  box-shadow: 0 0 8px var(--p-accent);
+}
+.hero-hud__canvas {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(circle at 65% 45%, #18231e 0%, #101413 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.hero-hud__svg {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  filter: drop-shadow(0 4px 16px rgb(0 0 0 / 0.6));
+}
+.hero-hud__footer {
+  padding: 14px 18px;
+  background: #161a19;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.hero-hud__stat dt {
+  font-size: 11px;
+  color: var(--p-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.hero-hud__stat dd {
+  margin: 0;
+  font: 500 13px/1 var(--font-mono);
+  color: var(--p-ink);
+}
+
+/* App Console */
+.app.ui {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  background: #141716;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 32px 64px -16px rgb(0 0 0 / 0.8);
+  height: 100%;
+}
+.app > .app__pane {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.app > .app__pane + .app__pane {
+  border-left: 1px solid rgb(255 255 255 / 0.08);
+}
+.app-pane-head {
+  padding: 10px 16px;
+  background: #191e1c;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  font: 500 11px/1 var(--font-mono);
+  color: var(--p-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.app-pane-head span b { color: var(--p-ink); }
+.app-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.app-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.04);
+  font-size: 12px;
+}
+.app-row.is-active {
+  background: rgb(218 250 156 / 0.08);
+  border-left: 3px solid var(--p-accent);
+}
+.app-row__icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font: 600 10px/1 var(--font-mono);
+  background: rgb(255 255 255 / 0.08);
+  color: var(--p-ink);
+}
+.app-row.is-active .app-row__icon {
+  background: var(--p-accent);
+  color: #0f0f0f;
+}
+.app-row__title {
+  font-weight: 500;
+  color: var(--p-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-row__sub {
+  font-size: 11px;
+  color: var(--p-muted);
+  margin-top: 1px;
+}
+.app-row__meta {
+  font: 500 11px/1 var(--font-mono);
+  color: var(--p-accent);
+}
+.app-detail-view {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+.app-detail-card {
+  background: #191f1c;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: var(--r-md);
+  padding: 14px;
+}
+.app-detail-card h4 {
+  font-size: 13px;
+  margin: 0 0 8px;
+  color: var(--p-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.app-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 12px;
+  font-size: 12px;
+}
+.app-detail-grid span { color: var(--p-muted); }
+.app-detail-grid b { color: var(--p-ink); font-family: var(--font-mono); font-weight: 500; }
+
+/* Tabs Tour */
+.role-tablist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.role-tab-btn {
+  background: #151917;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--p-ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.role-tab-btn[aria-selected="true"] {
+  background: rgb(218 250 156 / 0.1);
+  border-color: var(--p-accent);
+}
+.role-tab-btn b { display: block; font-size: 14px; margin-bottom: 3px; }
+.role-tab-btn span { font-size: 12px; color: var(--p-muted); }
+.role-panel-box {
+  background: #141716;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.role-panel-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: grid;
+  gap: 12px;
+}
+.role-panel-box li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #cfd4d1;
+}
+.role-panel-box li svg { color: var(--p-accent); flex-shrink: 0; }
+
+/* Specs Grid */
+.spec-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.spec-item {
+  background: #151917;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+.spec-item dt {
+  font: 500 11px/1 var(--font-mono);
+  color: var(--p-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.spec-item dd.val {
+  font: 500 18px/1.2 var(--font-display);
+  color: var(--p-ink);
+  margin: 0 0 6px;
+}
+.spec-item dd.desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--p-muted);
+}
+
+@media (max-width: 1023px) {
+  .app.ui { grid-template-columns: 1fr; }
+  .spec-list { grid-template-columns: 1fr; }
+}
+</style>
+<script src="assets/backgrounds/backgrounds.js"></script>
+</head>
+<body>
+<!-- type: software
+     deal: hero split, nav nav-mega, close close-type, footer footer-columns, rhythm surface-pairs, buttons arrow, mark arc, grounds bg-mist -->
+
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>ResQ</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#telemetry">Console <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <div class="menu-col span-4">
+              <p class="t-label">Dispatch Engine</p>
+              <a href="#telemetry">Live telemetry<span>Real-time fleet route vectors</span></a>
+              <a href="#telemetry">Incident queuing<span>Automated priority classification</span></a>
+            </div>
+            <div class="menu-col span-4">
+              <p class="t-label">Network Infrastructure</p>
+              <a href="#features">OpenStreetMap graph<span>Offline-tolerant road calculations</span></a>
+              <a href="#features">Vehicle coordination<span>GPS tracking and status feeds</span></a>
+            </div>
+            <div class="menu-col span-4">
+              <p class="t-label">Mobile Package</p>
+              <a href="#specs">Release APK<span>Direct 55 MB Android build</span></a>
+              <a href="#roles">Operational roles<span>Four unified responder views</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="#features">Capabilities</a></div>
+      <div class="nav__item"><a class="nav__link" href="#roles">Workspaces</a></div>
+      <div class="nav__item"><a class="nav__link" href="#specs">Specifications</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="app-release.apk" download="app-release.apk">Download APK<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO (hero--split) -->
+  <section class="hero hero--split bg-mist" aria-labelledby="hero-h" style="--h: 1">
+    <div class="wrap">
+      <div class="hero-text grid hero__grid">
+        <div class="hero__text span-5">
+          <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>ResQ Engine 3.12 · 55 MB APK</p>
+          <h1 id="hero-h">Emergency route and fleet management</h1>
+          <p class="hero__lead">Live dispatch, route optimization, and vehicle tracking for first responders. Offline-tolerant navigation on OpenStreetMap networks.</p>
+          <div class="btn-row">
+            <a class="btn btn--primary" href="app-release.apk" download="app-release.apk">Download APK<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <a class="btn btn--secondary" href="#telemetry">Explore console</a>
+          </div>
+        </div>
+        
+        <div class="hero__media span-6 start-7">
+          <div class="hero-hud" role="region" aria-label="Live emergency telemetry terminal">
+            <div class="hero-hud__bar">
+              <span class="hero-hud__tag">Live Dispatch Active</span>
+              <span>GPS FIX · 12 SATELLITES</span>
+            </div>
+            <div class="hero-hud__canvas">
+              <svg class="hero-hud__svg" viewBox="0 0 360 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M20 50 H340 M20 100 H340 M20 150 H340 M60 20 V180 M120 20 V180 M180 20 V180 M240 20 V180 M300 20 V180" stroke="currentColor" stroke-opacity="0.08" stroke-width="1.5"/>
+                <path d="M60 150 L120 150 L180 150" stroke="#f87171" stroke-width="2" stroke-dasharray="4 4" stroke-opacity="0.6"/>
+                <line x1="145" y1="145" x2="155" y2="155" stroke="#f87171" stroke-width="2.5"/>
+                <line x1="155" y1="145" x2="145" y2="155" stroke="#f87171" stroke-width="2.5"/>
+                <path d="M60 150 L60 100 L180 100 L180 50 L300 50" stroke="var(--p-accent)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="60" cy="150" r="6" fill="#141716" stroke="var(--p-accent)" stroke-width="2.5"/>
+                <circle cx="300" cy="50" r="7" fill="var(--p-accent)"/>
+                <circle cx="300" cy="50" r="14" stroke="var(--p-accent)" stroke-width="1.5" stroke-opacity="0.3"/>
+                <circle cx="180" cy="80" r="5" fill="#ffffff"/>
+                <circle cx="180" cy="80" r="10" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.4"/>
+              </svg>
+            </div>
+            <div class="hero-hud__footer">
+              <div class="hero-hud__stat">
+                <dt>Primary Unit</dt>
+                <dd>Ambulance 04</dd>
+              </div>
+              <div class="hero-hud__stat">
+                <dt>Shortest Path</dt>
+                <dd>4.2 km · 3.2 min</dd>
+              </div>
+              <div class="hero-hud__stat">
+                <dt>Priority Triage</dt>
+                <dd>Critical Cat-1</dd>
+              </div>
+            </div>
+          </div>
+          <div class="ly-float">
+            <div class="ly-float__row"><span class="ly-live">Active dispatch</span><span>Real-time</span></div>
+            <div class="ly-float__title">Ambulance 04 en route (3.2 min)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELEMETRY CONSOLE (app-frame) -->
+  <section class="section" id="telemetry" aria-labelledby="telemetry-h" style="--h: 1" data-screen="free">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="telemetry-h">Mission-critical dispatch console. <span class="muted">Live OSM road calculation and fleet coordination across municipal networks.</span></h2>
+      </div>
+      <div class="frame frame--hero fill" role="img" aria-label="Emergency route dispatch console" data-ui-pause-host>
+        <div class="app ui" style="height: 100%;">
+          <div class="app__pane app__pane--list">
+            <div class="app-pane-head">
+              <span>ACTIVE INCIDENTS (6)</span>
+              <span>QUEUE: <b>HIGH PRIORITY</b></span>
+            </div>
+            <ul class="app-rows">
+              <li class="app-row is-active">
+                <span class="app-row__icon">P1</span>
+                <div>
+                  <div class="app-row__title">Multi-vehicle collision (Highway 401)</div>
+                  <div class="app-row__sub">Unit 04 &amp; Engine 12 assigned · ETA 3 min</div>
+                </div>
+                <span class="app-row__meta">EN ROUTE</span>
+              </li>
+              <li class="app-row">
+                <span class="app-row__icon">P1</span>
+                <div>
+                  <div class="app-row__title">Structural fire alert (Commercial Sector)</div>
+                  <div class="app-row__sub">Ladder 03 dispatched · Water supply linked</div>
+                </div>
+                <span class="app-row__meta">ON SCENE</span>
+              </li>
+              <li class="app-row">
+                <span class="app-row__icon">P2</span>
+                <div>
+                  <div class="app-row__title">Cardiac distress call (Central District)</div>
+                  <div class="app-row__sub">Medic 08 assigned · Triage protocol beta</div>
+                </div>
+                <span class="app-row__meta">DISPATCHED</span>
+              </li>
+              <li class="app-row">
+                <span class="app-row__icon">P2</span>
+                <div>
+                  <div class="app-row__title">Gas leak sensor verification (West Bay)</div>
+                  <div class="app-row__sub">Hazard team haz-02 navigating perimeter</div>
+                </div>
+                <span class="app-row__meta">ROUTING</span>
+              </li>
+              <li class="app-row">
+                <span class="app-row__icon">P3</span>
+                <div>
+                  <div class="app-row__title">Citizen road obstacle report (Maple St)</div>
+                  <div class="app-row__sub">Downed tree branch blocking single lane</div>
+                </div>
+                <span class="app-row__meta">VERIFIED</span>
+              </li>
+              <li class="app-row">
+                <span class="app-row__icon">P3</span>
+                <div>
+                  <div class="app-row__title">Medical transfer protocol (General Hospital)</div>
+                  <div class="app-row__sub">Unit 14 standby · Scheduled release</div>
+                </div>
+                <span class="app-row__meta">STANDBY</span>
+              </li>
+            </ul>
+          </div>
+          <div class="app__pane app__pane--open" data-ui-loop>
+            <div class="app-pane-head">
+              <span>DISPATCH TELEMETRY · INCIDENT #2941</span>
+              <span>OSM GRAPH: <b>SYNCHRONIZED</b></span>
+            </div>
+            <div class="app-detail-view">
+              <div class="app-detail-card">
+                <h4>
+                  <span>Route Optimization Parameters</span>
+                  <span style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent);">ALGORITHM: DIJKSTRA / A*</span>
+                </h4>
+                <div class="app-detail-grid">
+                  <div><span>Origin Coordinates:</span> <b>43.6532° N, 79.3832° W</b></div>
+                  <div><span>Destination Hospital:</span> <b>St. Jude Trauma Wing</b></div>
+                  <div><span>Dynamic Roadblocks:</span> <b>1 Avoided (Maple Ave)</b></div>
+                  <div><span>Calculation Duration:</span> <b>84 ms</b></div>
+                  <div><span>Distance Delta:</span> <b>-1.8 km vs baseline</b></div>
+                  <div><span>ETA Adjustment:</span> <b>-4.5 min travel time</b></div>
+                </div>
+              </div>
+              <div class="app-detail-card">
+                <h4>
+                  <span>Assigned First Responder Units</span>
+                  <span style="font-family: var(--font-mono); font-size: 11px; color: var(--p-muted);">2 UNITS COMMITTED</span>
+                </h4>
+                <div class="app-detail-grid">
+                  <div><span>Primary Ambulance:</span> <b>Unit-04 (Advanced Life Support)</b></div>
+                  <div><span>Support Engine:</span> <b>Engine-12 (Heavy Rescue)</b></div>
+                  <div><span>Telemetry Ping:</span> <b>0.8s interval via LTE/GPS</b></div>
+                  <div><span>Hospital Bay:</span> <b>Emergency Trauma Bay 3 reserved</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES (3 cards across) -->
+  <section class="section ground-surface" id="features" aria-labelledby="features-h" style="--h: 1" data-screen="free">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="features-h">Engineered for critical uptime. <span class="muted">Routing, triage, and telemetry in one synchronized runtime.</span></h2>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-4">
+          <h3>Calculates dynamic road routes</h3>
+          <p>Avoids congestion and physical road hazards with offline-tolerant OpenStreetMap road networks.</p>
+          <div class="panel">
+            <div class="stage stage--fade-b">
+              <div class="at-rise fit" style="--fit-max:340px;--ax:max(16px, 50% - 170px);--ay:36px;--ay-sm:36px" data-ui-loop>
+                <div class="ui ui-panel" style="padding: 16px; font-size: 13px;">
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">ROUTING ENGINE</div>
+                  <div style="color: var(--p-ink); font-weight: 500; margin-bottom: 6px;">Dynamic obstacle rerouting</div>
+                  <div style="color: var(--p-muted); font-size: 12px; line-height: 1.4;">Road segment #8492 flagged impassable. 14 downstream responder paths recalculated in 62 ms.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card card--row card--open span-4">
+          <h3>Triages incoming casualties</h3>
+          <p>Automated priority queuing matches closest equipped emergency vehicles to severe casualty reports.</p>
+          <div class="panel">
+            <div class="stage stage--fade-b">
+              <div class="at-rise fit" style="--fit-max:340px;--ax:max(16px, 50% - 170px);--ay:36px;--ay-sm:36px">
+                <div class="ui ui-panel" style="padding: 16px; font-size: 13px;">
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">PRIORITY MATRIX</div>
+                  <div style="color: var(--p-ink); font-weight: 500; margin-bottom: 6px;">Trauma Severity: Level 1</div>
+                  <div style="color: var(--p-muted); font-size: 12px; line-height: 1.4;">Automatic vehicle allocation dispatched nearest ALS Ambulance (2.4 km) over standby units.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card card--row card--open span-4">
+          <h3>Coordinates fleet telemetry</h3>
+          <p>Full fleet position tracking with live status indicators for standby, en route, and on-scene units.</p>
+          <div class="panel">
+            <div class="stage stage--fade-b">
+              <div class="at-rise fit" style="--fit-max:340px;--ax:max(16px, 50% - 170px);--ay:36px;--ay-sm:36px">
+                <div class="ui ui-panel" style="padding: 16px; font-size: 13px;">
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">FLEET TELEMETRY</div>
+                  <div style="color: var(--p-ink); font-weight: 500; margin-bottom: 6px;">18 vehicles active</div>
+                  <div style="color: var(--p-muted); font-size: 12px; line-height: 1.4;">Continuous tracking via GPS, GLONASS, and dead-reckoning fusion across urban corridors.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLES (tabs-tour) -->
+  <section class="section" id="roles" aria-labelledby="roles-h" style="--h: 1" data-screen="free">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="roles-h">Four unified operational roles. <span class="muted">A single application providing specialized workspaces tailored by authenticated role.</span></h2>
+      </div>
+      <div class="grid fill">
+        <div class="role-tablist span-5" role="tablist" aria-label="Role selector">
+          <button class="role-tab-btn" role="tab" id="tab-admin" aria-selected="true" aria-controls="panel-admin">
+            <div>
+              <b>Administrator</b>
+              <span>Fleet management and operations health</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="role-tab-btn" role="tab" id="tab-dispatcher" aria-selected="false" aria-controls="panel-dispatcher">
+            <div>
+              <b>Dispatcher</b>
+              <span>Incident queuing and unit assignment</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="role-tab-btn" role="tab" id="tab-responder" aria-selected="false" aria-controls="panel-responder">
+            <div>
+              <b>First Responder</b>
+              <span>Turn-by-turn navigation and status updates</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="role-tab-btn" role="tab" id="tab-citizen" aria-selected="false" aria-controls="panel-citizen">
+            <div>
+              <b>Citizen</b>
+              <span>One-tap emergency reporting and status</span>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="role-panels frame span-6 start-7" role="img" aria-label="Role preview panel">
+          <div class="role-panel-box" id="panel-admin" role="tabpanel" aria-labelledby="tab-admin">
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">ADMINISTRATIVE WORKSPACE</div>
+              <h3 style="font-size: 20px; margin: 0 0 10px;">Operations Administration</h3>
+              <p style="color: var(--p-muted); font-size: 14px; line-height: 1.5; margin: 0;">Manage municipal fleet assets, audit dispatch records, configure triage routing rules, and monitor regional response latency.</p>
+              <ul>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Fleet readiness and equipment inventory matrix</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Real-time triage audit trails and historical response logs</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Role-based security provisioning and user permissions</li>
+              </ul>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--p-accent); border-top: 1px solid rgb(255 255 255 / 0.08); padding-top: 14px;">
+              STATUS: FULL SYSTEM VISIBILITY
+            </div>
+          </div>
+
+          <div class="role-panel-box" id="panel-dispatcher" role="tabpanel" aria-labelledby="tab-dispatcher" hidden>
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">DISPATCH WORKSPACE</div>
+              <h3 style="font-size: 20px; margin: 0 0 10px;">Dispatcher Triage Console</h3>
+              <p style="color: var(--p-muted); font-size: 14px; line-height: 1.5; margin: 0;">Coordinate incoming 911 reports, verify incident locations against OSM data, and dispatch optimal emergency apparatus with one click.</p>
+              <ul>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Priority queuing matching incident severity to closest units</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Instant route broadcast directly to responder in-cab displays</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Live road blockage reporting and manual route recalculation</li>
+              </ul>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--p-accent); border-top: 1px solid rgb(255 255 255 / 0.08); padding-top: 14px;">
+              STATUS: DISPATCH CONSOLE READY
+            </div>
+          </div>
+
+          <div class="role-panel-box" id="panel-responder" role="tabpanel" aria-labelledby="tab-responder" hidden>
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">RESPONDER WORKSPACE</div>
+              <h3 style="font-size: 20px; margin: 0 0 10px;">First Responder Navigation</h3>
+              <p style="color: var(--p-muted); font-size: 14px; line-height: 1.5; margin: 0;">In-vehicle tactile interface providing live turn-by-turn guidance, hazard notifications, and single-tap status transmission to command.</p>
+              <ul>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Offline turn-by-turn road navigation powered by OSM</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> One-touch status buttons (Standby, En Route, On Scene, Hospital)</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Automated telemetry transmission with battery optimization</li>
+              </ul>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--p-accent); border-top: 1px solid rgb(255 255 255 / 0.08); padding-top: 14px;">
+              STATUS: VEHICLE TELEMETRY ACTIVE
+            </div>
+          </div>
+
+          <div class="role-panel-box" id="panel-citizen" role="tabpanel" aria-labelledby="tab-citizen" hidden>
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--p-accent); margin-bottom: 8px;">CITIZEN WORKSPACE</div>
+              <h3 style="font-size: 20px; margin: 0 0 10px;">Citizen Emergency Portal</h3>
+              <p style="color: var(--p-muted); font-size: 14px; line-height: 1.5; margin: 0;">Immediate emergency reporting with verified GPS geotags, casualty triage details, and live responder arrival time estimates.</p>
+              <ul>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Single-tap SOS report generation with automatic location ping</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Real-time status tracker showing dispatched emergency apparatus</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Offline SMS fallback capability when data networks fail</li>
+              </ul>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--p-accent); border-top: 1px solid rgb(255 255 255 / 0.08); padding-top: 14px;">
+              STATUS: CITIZEN SOS NETWORK ONLINE
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECS -->
+  <section class="section ground-surface" id="specs" aria-labelledby="specs-h" style="--h: 1" data-screen="free">
+    <div class="wrap">
+      <div class="grid fill">
+        <div class="span-5">
+          <div class="section-head">
+            <h2 id="specs-h">Technical specifications. <span class="muted">Engine benchmarks, network protocols, and Android release package.</span></h2>
+          </div>
+          <dl class="spec-list">
+            <div class="spec-item">
+              <dt>Routing Engine</dt>
+              <dd class="val">Dijkstra / A*</dd>
+              <dd class="desc">Recalculations complete in &lt; 120 ms over metropolitan graph networks.</dd>
+            </div>
+            <div class="spec-item">
+              <dt>Release Package</dt>
+              <dd class="val">55 MB APK</dd>
+              <dd class="desc">Standalone artifact compiled for Android 8.0+ field tablets and devices.</dd>
+            </div>
+            <div class="spec-item">
+              <dt>Map Data</dt>
+              <dd class="val">OpenStreetMap</dd>
+              <dd class="desc">Offline-capable vector tile cache with road attributes and speed limits.</dd>
+            </div>
+            <div class="spec-item">
+              <dt>Telemetry Protocol</dt>
+              <dd class="val">WebSocket</dd>
+              <dd class="desc">Sub-second bidirectional vehicle status synchronization with offline queueing.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="frame frame--split span-6 start-7 fill" role="img" aria-label="Telemetry integration diagram">
+          <div class="dg" data-diagram="fanin-telemetry" data-dg-phone="loop" style="width: 100%; height: 100%;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" aria-labelledby="faq-h" style="--h: 1" data-screen="free">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-4">
+          <div class="section-head">
+            <h2 id="faq-h">Frequently asked questions. <span class="muted">Deployment, permissions, and field compatibility.</span></h2>
+            <p><a class="link" href="#contact">Contact operations team</a></p>
+          </div>
+        </div>
+        <div class="span-7 start-6">
+          <div class="faq">
+            <div class="faq__item">
+              <h3>Does the mobile application function offline?</h3>
+              <p>Yes. The road network graph and active dispatch instructions cache locally, syncing automatically when cellular connectivity restores.</p>
+            </div>
+            <div class="faq__item">
+              <h3>What Android permissions are required?</h3>
+              <p>High-accuracy GPS location for responder tracking, push notifications for critical triage dispatches, and storage for the spatial map cache.</p>
+            </div>
+            <div class="faq__item">
+              <h3>How is the release APK deployed to field units?</h3>
+              <p>The 55 MB standalone package installs directly on municipal mobile devices without third-party app store dependencies.</p>
+            </div>
+            <div class="faq__item">
+              <h3>How are road blockages reported and shared?</h3>
+              <p>Field responders flag blocked corridors with one tap, instantly updating the central graph and rerouting all following units.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER.CLOSING: close-type + footer-columns -->
+<footer class="footer closing" id="contact" aria-labelledby="close-h" style="--h: 1" data-screen="free">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Equip your emergency fleet today.</h2>
+        <p>Download the standalone 55 MB Android release package for field dispatch operations.</p>
+      </div>
+      <a class="btn btn--primary btn--xl" href="app-release.apk" download="app-release.apk">Download APK<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-4">
+          <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>ResQ</a>
+          <p class="footer__lede">Emergency route optimization and fleet coordination.</p>
+        </div>
+        <div class="span-3 start-7 footer__col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#telemetry">Console</a></li>
+            <li><a href="#features">Capabilities</a></li>
+            <li><a href="#roles">Workspaces</a></li>
+          </ul>
+        </div>
+        <div class="span-3 footer__col">
+          <h4>System</h4>
+          <ul>
+            <li><a href="#specs">Specifications</a></li>
+            <li><a href="#faq">Questions</a></li>
+            <li><a href="app-release.apk" download="app-release.apk">Release APK</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 ResQ Operations &nbsp; <a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></span>
+        <div class="socials"></div>
+        <a class="credits" href="privacy.html">ResQ Operations Core Platform</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+<script type="module" src="assets/diagrams/mount.js"></script>
+</body>
+</html>

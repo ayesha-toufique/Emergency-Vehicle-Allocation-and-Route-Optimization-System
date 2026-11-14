@@ -301,9 +301,13 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
                               ),
                             ),
                             FilledButton.icon(
-                              style: FilledButton.styleFrom(backgroundColor: AppColors.primaryTeal),
-                              icon: const Icon(Icons.navigation_rounded, size: 18),
-                              label: const Text('Open Mission'),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.primaryTeal,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              icon: const Icon(Icons.navigation_rounded, size: 16),
+                              label: const Text('Open Mission', style: TextStyle(fontSize: 12)),
                               onPressed: () {
                                 if (widget.onNavigateToTab != null) {
                                   widget.onNavigateToTab!(1); // Navigate to Mission tab

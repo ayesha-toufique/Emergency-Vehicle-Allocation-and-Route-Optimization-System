@@ -1,6 +1,7 @@
 Django>=5.1,<5.2
 djangorestframework>=3.15,<3.16
 django-cors-headers>=4.4,<5
+drf-spectacular>=0.27,<0.29
 PyMySQL>=1.1,<2
 cryptography>=42  # needed by PyMySQL for MySQL 8 default auth (caching_sha2_password)
 gunicorn>=22 ; sys_platform != "win32"

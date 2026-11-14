@@ -8,6 +8,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/mock/demo_data.dart';
 import '../../../core/mock/mock_repository.dart';
+import '../../../core/services/api_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/services/session_service.dart';
 import '../../../core/widgets/brand/resq_app_bar.dart';
@@ -116,7 +117,8 @@ class _ReportEmergencyScreenState extends State<ReportEmergencyScreen> {
       final repo = context.read<MockRepository>();
       final session = context.read<SessionService>();
 
-      final newEmergency = repo.reportEmergency(
+      final apiService = ApiService();
+      final response = await apiService.reportEmergency(
         category: _selectedCategory,
         severity: _severity,
         urgency: _urgency,
@@ -129,7 +131,10 @@ class _ReportEmergencyScreenState extends State<ReportEmergencyScreen> {
             ? 'Karachi Grid Location'
             : _addressController.text.trim(),
         userId: session.userName,
+        mockRepo: repo,
       );
+
+      final newEmergency = response.data ?? repo.emergencies.first;
 
       if (!mounted) return;
 

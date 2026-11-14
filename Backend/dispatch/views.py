@@ -517,7 +517,11 @@ def plan_recalculate(request):
 @permission_classes([IsDispatcherOrAdmin])
 def plan_history(request):
     """GET /api/plan/history/?limit=20 - previous plan runs with stats."""
-    limit = min(int(request.query_params.get("limit", 20)), 200)
+    raw_limit = request.query_params.get("limit", 20)
+    try:
+        limit = min(max(1, int(raw_limit)), 200)
+    except (ValueError, TypeError):
+        raise BadRequest("limit must be a positive integer (max 200).")
     return Response([
         {"plan_id": p.id, "reason": p.reason, "created_at": p.created_at.isoformat(),
          "created_by": p.created_by.name if p.created_by else None, "summary": p.summary}
@@ -633,7 +637,11 @@ def notifications_list(request):
     read_ids = set(NotificationRead.objects.filter(user=request.user).values_list("notification_id", flat=True))
     if _bool_param(request, "unread"):
         qs = qs.exclude(id__in=read_ids)
-    limit = min(int(request.query_params.get("limit", 50)), 200)
+    raw_limit = request.query_params.get("limit", 50)
+    try:
+        limit = min(max(1, int(raw_limit)), 200)
+    except (ValueError, TypeError):
+        raise BadRequest("limit must be a positive integer (max 200).")
     unread = _notifications_for(request.user).exclude(id__in=read_ids).count()
     data = NotificationSerializer(qs[:limit], many=True, context={"read_ids": read_ids}).data
     return Response({"unread_count": unread, "results": data})
@@ -664,7 +672,11 @@ def notifications_read_all(request):
 @permission_classes([IsDispatcherOrAdmin])
 def reports_summary(request):
     """GET /api/reports/summary/?days=30 - aggregate metrics for the admin reports screen."""
-    days = int(request.query_params.get("days", 30))
+    raw_days = request.query_params.get("days", 30)
+    try:
+        days = min(max(1, int(raw_days)), 3650)
+    except (ValueError, TypeError):
+        raise BadRequest("days must be a positive integer.")
     since = timezone.now() - timedelta(days=days)
     ems = Emergency.objects.filter(created_at__gte=since)
     by_status = dict(ems.values_list("status").annotate(c=Count("id")).order_by())

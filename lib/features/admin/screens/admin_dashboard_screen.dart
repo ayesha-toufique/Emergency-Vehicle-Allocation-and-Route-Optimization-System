@@ -111,51 +111,59 @@ class AdminDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Primary Metrics Grid
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Total Users',
-                        value: '$totalUsers',
-                        icon: Icons.people_rounded,
-                        iconColor: AppColors.primaryTeal,
-                        subtitle: '$citizensCount citizens · $staffCount staff',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Active Incidents',
-                        value: '$activeEmergencies',
-                        icon: Icons.crisis_alert_rounded,
-                        iconColor: AppColors.emergencyPink,
-                        subtitle: '$resolvedEmergencies resolved',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Fleet Ready',
-                        value: '$availableVehicles / $totalVehicles',
-                        icon: Icons.local_shipping_rounded,
-                        iconColor: AppColors.statusCompleted,
-                        subtitle: '${totalVehicles - availableVehicles} in operation',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: DashboardCard(
-                        title: 'Resources Logged',
-                        value: '${repo.resources.length}',
-                        icon: Icons.inventory_2_rounded,
-                        iconColor: AppColors.statusAssigned,
-                        subtitle: 'Equipment & crew',
-                      ),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final int crossAxisCount = width > 768 ? 4 : (width > 340 ? 2 : 1);
+                    final cardWidth = (width - ((crossAxisCount - 1) * 12)) / crossAxisCount;
+
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Total Users',
+                            value: '$totalUsers',
+                            icon: Icons.people_rounded,
+                            iconColor: AppColors.primaryTeal,
+                            subtitle: '$citizensCount citizens · $staffCount staff',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Active Incidents',
+                            value: '$activeEmergencies',
+                            icon: Icons.crisis_alert_rounded,
+                            iconColor: AppColors.emergencyPink,
+                            subtitle: '$resolvedEmergencies resolved',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Fleet Ready',
+                            value: '$availableVehicles / $totalVehicles',
+                            icon: Icons.local_shipping_rounded,
+                            iconColor: AppColors.statusCompleted,
+                            subtitle: '${totalVehicles - availableVehicles} in operation',
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: DashboardCard(
+                            title: 'Resources Logged',
+                            value: '${repo.resources.length}',
+                            icon: Icons.inventory_2_rounded,
+                            iconColor: AppColors.statusAssigned,
+                            subtitle: 'Equipment & crew',
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 24),
@@ -166,55 +174,63 @@ class AdminDashboardScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 12),
-                GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.6,
-                  children: [
-                    _buildAdminTile(
-                      icon: Icons.badge_rounded,
-                      title: 'Staff Management',
-                      subtitle: 'Provision Dispatchers & Drivers',
-                      badge: '$staffCount Staff',
-                      onTap: () {
-                        if (onNavigateToTab != null) onNavigateToTab!(1);
-                      },
-                      isDark: isDark,
-                    ),
-                    _buildAdminTile(
-                      icon: Icons.directions_car_filled_rounded,
-                      title: 'Fleet Management',
-                      subtitle: 'Add & monitor vehicles',
-                      badge: '$totalVehicles Units',
-                      onTap: () {
-                        if (onNavigateToTab != null) onNavigateToTab!(2);
-                      },
-                      isDark: isDark,
-                    ),
-                    _buildAdminTile(
-                      icon: Icons.inventory_rounded,
-                      title: 'Resource Allocation',
-                      subtitle: 'Oxygen, trauma, fuel & crew',
-                      badge: '${repo.resources.length} Items',
-                      onTap: () {
-                        if (onNavigateToTab != null) onNavigateToTab!(3);
-                      },
-                      isDark: isDark,
-                    ),
-                    _buildAdminTile(
-                      icon: Icons.insights_rounded,
-                      title: 'System Analytics',
-                      subtitle: 'Performance & incident charts',
-                      badge: '$totalEmergencies Reports',
-                      onTap: () {
-                        if (onNavigateToTab != null) onNavigateToTab!(4);
-                      },
-                      isDark: isDark,
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final int crossAxisCount = width > 768 ? 4 : (width > 380 ? 2 : 1);
+                    final double aspectRatio = width > 768 ? 1.6 : (width > 380 ? 1.25 : 2.0);
+
+                    return GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      childAspectRatio: aspectRatio,
+                      children: [
+                        _buildAdminTile(
+                          icon: Icons.badge_rounded,
+                          title: 'Staff Management',
+                          subtitle: 'Provision Dispatchers & Drivers',
+                          badge: '$staffCount Staff',
+                          onTap: () {
+                            if (onNavigateToTab != null) onNavigateToTab!(1);
+                          },
+                          isDark: isDark,
+                        ),
+                        _buildAdminTile(
+                          icon: Icons.directions_car_filled_rounded,
+                          title: 'Fleet Management',
+                          subtitle: 'Add & monitor vehicles',
+                          badge: '$totalVehicles Units',
+                          onTap: () {
+                            if (onNavigateToTab != null) onNavigateToTab!(2);
+                          },
+                          isDark: isDark,
+                        ),
+                        _buildAdminTile(
+                          icon: Icons.inventory_rounded,
+                          title: 'Resource Allocation',
+                          subtitle: 'Oxygen, trauma, fuel & crew',
+                          badge: '${repo.resources.length} Items',
+                          onTap: () {
+                            if (onNavigateToTab != null) onNavigateToTab!(3);
+                          },
+                          isDark: isDark,
+                        ),
+                        _buildAdminTile(
+                          icon: Icons.insights_rounded,
+                          title: 'System Analytics',
+                          subtitle: 'Performance & incident charts',
+                          badge: '$totalEmergencies Reports',
+                          onTap: () {
+                            if (onNavigateToTab != null) onNavigateToTab!(4);
+                          },
+                          isDark: isDark,
+                        ),
+                      ],
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 24),
@@ -234,11 +250,14 @@ class AdminDashboardScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.dns_rounded, color: AppColors.primaryTeal, size: 20),
                             const SizedBox(width: 8),
-                            Text(
-                              'System Health & Infrastructure Telemetry',
-                              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                            Expanded(
+                              child: Text(
+                                'System Health & Infrastructure Telemetry',
+                                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            const Spacer(),
+                            const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
@@ -246,7 +265,7 @@ class AdminDashboardScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'ALL SYSTEMS OPERATIONAL',
+                                'ALL OPERATIONAL',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w800,
@@ -290,7 +309,7 @@ class AdminDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -299,18 +318,18 @@ class AdminDashboardScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
                       color: AppColors.primaryTeal.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(icon, color: AppColors.primaryTeal, size: 22),
+                    child: Icon(icon, color: AppColors.primaryTeal, size: 20),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primaryNavy.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       badge,
@@ -323,20 +342,25 @@ class AdminDashboardScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 6),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      height: 1.25,
                     ),
                   ),
                 ],
@@ -350,29 +374,68 @@ class AdminDashboardScreen extends StatelessWidget {
 
   Widget _buildHealthRow(String label, String status, bool isHealthy) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(
-            isHealthy ? Icons.check_circle_rounded : Icons.error_rounded,
-            size: 16,
-            color: isHealthy ? AppColors.statusCompleted : Colors.red,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              label,
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            status,
-            style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 460) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      isHealthy ? Icons.check_circle_rounded : Icons.error_rounded,
+                      size: 14,
+                      color: isHealthy ? AppColors.statusCompleted : Colors.red,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, top: 2),
+                  child: Text(
+                    status,
+                    style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
+                  ),
+                ),
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Icon(
+                isHealthy ? Icons.check_circle_rounded : Icons.error_rounded,
+                size: 16,
+                color: isHealthy ? AppColors.statusCompleted : Colors.red,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 5,
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 4,
+                child: Text(
+                  status,
+                  textAlign: TextAlign.end,
+                  style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
